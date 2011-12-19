@@ -1,15 +1,22 @@
-param([hashtable] $weightings,
+param([hashtable] $counts,
 	[array] $data = (./OptionalNLPProgramming2Data.ps1),
 	[int] $smoothing = 1)
 
-function Normalize-Weightings([hashtable] $weightings, [int] $smoothing)
+function Smoothing-Denominator([hashtable] $counts, [int] $smoothing)
+{
+	$total = [float] (($counts.Values | Measure-Object -sum).Sum);
+	$total += $counts.Count * $smoothing;
+	$total;
+}
+	
+function Normalize-Weightings([hashtable] $counts, [int] $smoothing)
 {
 	$results = @{};
-	$total = [float] (($weightings.Values | Measure-Object -sum).Sum);
-	$total += $weightings.Count * $smoothing;
+	$denominator = Smoothing-Denominator $counts $smoothing;
 	
-	$weightings.Keys |% {
-		$results[$_] = ([float] $weightings[$_] + $smoothing) / $total;
+	$counts.Keys |% {
+		$normalized = ([float] $counts[$_] + $smoothing) / $denominator
+		$results[$_] = $normalized;
 	}
 	
 	$results;
@@ -82,7 +89,7 @@ function UnScramble-Columns(
 {
 	if($remainingColumns.Count -eq 0)
 	{
-		return $results;;
+		return $results;
 	}
 
 	$highest = 0.0;
@@ -126,15 +133,15 @@ function UnScramble-Columns(
 	}
 }
 
-$noMatchProbability = ([float] $smoothing) / $weightings.Count;
+$noMatchProbability = 1.0 / (Smoothing-Denominator $counts $smoothing);
+$weightings = Normalize-Weightings $counts $smoothing;
+
 $dataInColumns = Transpose $data;
 
 $firstColumn, $remainingColumns = $dataInColumns;
 $orderedColumns = UnScramble-Columns @(, $firstColumn) $remainingColumns; # Comma prevents array flattening;
 
-Write-Host "Columns $($orderedColumns.Count)";
 $rows = Transpose $orderedColumns;
-Write-Host "Rows $($rows.Count)";
 
 $rows |% {
 	Write-Host ([String]::Join('', $_));
