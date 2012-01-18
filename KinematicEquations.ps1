@@ -70,7 +70,14 @@ if($time -eq $null)
 	}
 	else
 	{
-		$time = ($vf - $vi) / $acc;
+		if($acc -eq 0)
+		{
+			$time = $distance / $vi;
+		}
+		else
+		{
+			$time = ($vf - $vi) / $acc;
+		}
 	}
 }
 if($vi -eq $null)
