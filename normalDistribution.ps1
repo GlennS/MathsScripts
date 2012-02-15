@@ -5,4 +5,11 @@ if(-not $standardDev)
 	$standardDev = [Math]::Sqrt($variance);
 }
 
-(1 / ($standardDev * [Math]::Sqrt(2 * [Math]::Pi))) * [Math]::Exp(-0.5 * [Math]::Pow(($x - $mean)/$standardDev, 2));
+$xMinusMu = $x - $mean;
+$xMinusMuOverSigma = $xMinusMu / $standardDev;
+$xMinusMuOverSigmaSq = [Math]::Pow($xMinusMuOverSigma, 2);
+
+$root2Pi = [Math]::Sqrt(2 * [Math]::Pi);
+$sigmaRoot2Pi = $standardDev * $root2Pi;
+
+[Math]::Exp(-0.5 * $xMinusMuOverSigmaSq) / $sigmaRoot2Pi
