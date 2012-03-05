@@ -1,9 +1,9 @@
 param(
-	$distance,
-	$acc,
-	$time,
-	$vi, # initial velocity
-	$vf # final velocity
+	[float] $distance,
+	[float] $acc,
+	[float] $time,
+	[float] $vi, # initial velocity
+	[float] $vf # final velocity
 )
 
 function Round($num)
