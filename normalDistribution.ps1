@@ -4,12 +4,20 @@ if(-not $standardDev)
 {
 	$standardDev = [Math]::Sqrt($variance);
 }
+else
+{
+	$variance = [Math]::Pow($standardDev, 2);
+}
 
 $xMinusMu = $x - $mean;
 $xMinusMuOverSigma = $xMinusMu / $standardDev;
-$xMinusMuOverSigmaSq = [Math]::Pow($xMinusMuOverSigma, 2);
 
-$root2Pi = [Math]::Sqrt(2 * [Math]::Pi);
-$sigmaRoot2Pi = $standardDev * $root2Pi;
+# Z represents the difference of X from the mean as a proportion of standard deviation.
+$Z = $xMinusMuOverSigma;
 
-[Math]::Exp(-0.5 * $xMinusMuOverSigmaSq) / $sigmaRoot2Pi
+$eToTheZSq = [Math]::Exp([Math]::Pow($Z, 2));
+
+$tau = 2 * [Math]::Pi;
+$sigmaSquaredtau = $variance * $tau;
+
+1 / [Math]::Sqrt($sigmaSquaredtau * $eToTheZSq);
